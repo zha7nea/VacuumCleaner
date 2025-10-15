@@ -1,188 +1,216 @@
 ﻿using System;
+using System.Threading;
+
 namespace RobotCleaner
 {
-  public class Map
-  {
-    private enum CellType { Empty, Dirt, Obstacle, Cleaned };
-    private CellType[,] _grid;
-    public int Width {get; private set;}
-    public int Height {get; private set;}
-
-    public Map(int width, int height)
+    public class Map
     {
-      this.Width = width;
-      this.Height = height;
-      _grid = new CellType[width, height];
-      for (int x = 0; x < width; x++)
-      {
-        for (int y = 0; y < height; y++ )
+        private enum CellType { Empty, Dirt, Obstacle, Cleaned };
+        private CellType[,] _grid;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
+        public Map(int width, int height)
         {
-          _grid[x,y] = CellType.Empty;
+            Width = width;
+            Height = height;
+            _grid = new CellType[width, height];
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    _grid[x, y] = CellType.Empty;
         }
-      }
-    }
 
-    public bool IsInBounds(int x, int y)
-    {
-      return x >= 0 && x < this.Width && y >= 0 && y < this.Height;
-    }
-
-    public bool IsDirt(int x, int y){
-      return IsInBounds(x,y) && _grid[x,y] == CellType.Dirt;
-    }
-
-    public bool IsObstacle(int x, int y){
-      return IsInBounds(x,y) && _grid[x,y] == CellType.Obstacle;
-    }
-
-    public void AddObstacle(int x, int y)
-    {
-      _grid[x, y] = CellType.Obstacle;
-    }
-    public void AddDirt(int x, int y)
-    {
-      _grid[x, y] = CellType.Dirt;
-    }
-
-    public void Clean(int x, int y)
-    {
-      if( IsInBounds(x,y))
-      {
-        _grid[x, y] = CellType.Cleaned;
-      }
-    }
-    public void Display(int robotX, int robotY)
-    {
-      // display the 2d grid, it accepts the location of the robot in x and y
-      Console.Clear();
-      Console.WriteLine("Vacuum cleaner robot simulation");
-      Console.WriteLine("--------------------------------");
-      Console.WriteLine("Legends: #=Obstacles, D=Dirt, .=Empty, R=Robot, C=Cleaned");
-
-      //display the grid using loop
-      for (int y = 0; y < this.Height; y++)
-      {
-        for (int x = 0; x < this.Width; x++)
+        public bool IsInBounds(int x, int y)
         {
-          if( x==robotX && y == robotY)
-          {
-            Console.Write("R ");
-          }
-          else
-          {
-            switch(_grid[x,y])
+            return x >= 0 && x < Width && y >= 0 && y < Height;
+        }
+
+        public bool IsDirt(int x, int y) => IsInBounds(x, y) && _grid[x, y] == CellType.Dirt;
+        public bool IsObstacle(int x, int y) => IsInBounds(x, y) && _grid[x, y] == CellType.Obstacle;
+
+        public void AddObstacle(int x, int y) => _grid[x, y] = CellType.Obstacle;
+        public void AddDirt(int x, int y) => _grid[x, y] = CellType.Dirt;
+
+        public void Clean(int x, int y)
+        {
+            if (IsInBounds(x, y))
+                _grid[x, y] = CellType.Cleaned;
+        }
+
+        public void Display(int robotX, int robotY)
+        {
+            Console.Clear();
+            Console.WriteLine("Vacuum Cleaner Robot Simulation");
+            Console.WriteLine("--------------------------------");
+            Console.WriteLine("Legend: #=Obstacle | D=Dirt | .=Empty | R=Robot | C=Cleaned\n");
+
+            for (int y = 0; y < Height; y++)
             {
-              case CellType.Empty: Console.Write(". "); break;
-              case CellType.Dirt: Console.Write("D "); break;
-              case CellType.Obstacle: Console.Write("# "); break;
-              case CellType.Cleaned: Console.Write("C "); break;
+                for (int x = 0; x < Width; x++)
+                {
+                    if (x == robotX && y == robotY)
+                        Console.Write("R ");
+                    else
+                    {
+                        switch (_grid[x, y])
+                        {
+                            case CellType.Empty: Console.Write(". "); break;
+                            case CellType.Dirt: Console.Write("D "); break;
+                            case CellType.Obstacle: Console.Write("# "); break;
+                            case CellType.Cleaned: Console.Write("C "); break;
+                        }
+                    }
+                }
+                Console.WriteLine();
             }
-          }
+            Thread.Sleep(200);
         }
-        Console.WriteLine();
-      } //outer for loop
-      // add delay
-      Thread.Sleep(200);
-    } // display method
-  }//class map
-  public interface IStrategy
-  {
-    void Clean(Robot robot);
-  }
-
-  public class Robot
-  {
-    private readonly Map _map;
-    private readonly IStrategy _strategy;
-
-    public int X {get; set;}
-    public int Y {get; set;}
-
-    public Map Map { get { return _map;}}
-
-    public Robot(Map map, IStrategy strategy)
-    {
-      _map = map;
-      _strategy = strategy;
-      X = 0;
-      Y = 0;
     }
 
-    public bool Move(int newX, int newY)
+    public interface IStrategy
     {
-      if( _map.IsInBounds(newX, newY) && !_map.IsObstacle(newX, newY) )
-      {
-        // set the new location
-        X = newX;
-        Y = newY;
-        // display the map with the robot in its location in the grid
-        _map.Display(X, Y);
-          return true;
-      }
-      // it cannot move
-      return false;
-    }// Move method
-
-    public void CleanCurrentSpot()
-    {
-      if(_map.IsDirt(X, Y))
-      {
-        _map.Clean(X, Y);
-        _map.Display(X, Y);
-      }
+        void Clean(Robot robot);
     }
 
-    public void StartCleaning()
+    public class Robot
     {
-      _strategy.Clean(this);
-    }
-  }
+        private readonly Map _map;
+        private readonly IStrategy _strategy;
 
- public class SomeStrategy : IStrategy
-  {
-    public void Clean(Robot robot)
-    {
-        int direction = 1; // 1 = right, -1 = left
-        for (int y = 0; y < robot.Map.Height; y++)
+        public int X { get; set; }
+        public int Y { get; set; }
+        public Map Map => _map;
+
+        public Robot(Map map, IStrategy strategy)
         {
-            int startX = (direction == 1) ? 0 : robot.Map.Width - 1;
-            int endX = (direction == 1) ? robot.Map.Width : -1;
-            
-            for (int x = startX; x != endX; x += direction)
+            _map = map;
+            _strategy = strategy;
+            X = 0;
+            Y = 0;
+        }
+
+        public bool Move(int newX, int newY)
+        {
+            if (_map.IsInBounds(newX, newY) && !_map.IsObstacle(newX, newY))
             {
-                robot.Move(x, y);
+                X = newX;
+                Y = newY;
+                _map.Display(X, Y);
+                return true;
+            }
+            return false;
+        }
+
+        public void CleanCurrentSpot()
+        {
+            if (_map.IsDirt(X, Y))
+            {
+                _map.Clean(X, Y);
+                _map.Display(X, Y);
+            }
+        }
+
+        public void StartCleaning() => _strategy.Clean(this);
+    }
+
+    public class SomeStrategy : IStrategy
+    {
+        public void Clean(Robot robot)
+        {
+            int direction = 1;
+            for (int y = 0; y < robot.Map.Height; y++)
+            {
+                int startX = (direction == 1) ? 0 : robot.Map.Width - 1;
+                int endX = (direction == 1) ? robot.Map.Width : -1;
+
+                for (int x = startX; x != endX; x += direction)
+                {
+                    robot.Move(x, y);
+                    robot.CleanCurrentSpot();
+                }
+                direction *= -1;
+            }
+        }
+    }
+
+    public class PerimeterHuggerStrategy : IStrategy
+    {
+        public void Clean(Robot robot)
+        {
+            robot.Move(0, 0);
+            robot.CleanCurrentSpot();
+
+            while (robot.Move(robot.X + 1, robot.Y))
                 robot.CleanCurrentSpot();
-            }
-            direction *= -1; // Reverse direction for the next row
+
+            while (robot.Move(robot.X, robot.Y + 1))
+                robot.CleanCurrentSpot();
+
+            while (robot.Move(robot.X - 1, robot.Y))
+                robot.CleanCurrentSpot();
+
+            while (robot.Move(robot.X, robot.Y - 1))
+                robot.CleanCurrentSpot();
         }
     }
-  }
 
-  public class Program
-  {
+    public class SpiralStrategy : IStrategy
+    {
+        public void Clean(Robot robot)
+        {
+            int[,] directions = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+            int dirIndex = 0;
+            int segmentLength = 1;
+            int stepsTaken = 0;
+            int turns = 0;
 
-    public static void Main(string[] args){
-      Console.WriteLine("Initialize robot");
+            robot.CleanCurrentSpot();
 
+            while (true)
+            {
+                bool moved = robot.Move(
+                    robot.X + directions[dirIndex, 0],
+                    robot.Y + directions[dirIndex, 1]
+                );
 
-      IStrategy some_strategy = new SomeStrategy();
+                if (!moved) break;
 
-      Map map = new Map(20, 10);
-      // map.Display( 10,10);
+                robot.CleanCurrentSpot();
+                stepsTaken++;
 
-      map.AddDirt(5,3);
-      map.AddDirt(10, 8);
-      map.AddObstacle(2,5);
-      map.AddObstacle(12,1);
-      map.Display(11,8);
+                if (stepsTaken == segmentLength)
+                {
+                    stepsTaken = 0;
+                    dirIndex = (dirIndex + 1) % 4;
+                    turns++;
 
-      Robot robot = new Robot(map,some_strategy);
-
-      robot.StartCleaning();
-
-      Console.WriteLine("Done.");
+                    if (turns % 2 == 0)
+                        segmentLength++;
+                }
+            }
+        }
     }
-      public class PerimeterHuggerStrategy :IStrategy
-      
-  }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("MIDTERM EXAM: Robot Cleaner Simulation\n");
+
+            Map map = new Map(20, 10);
+            map.AddDirt(5, 3);
+            map.AddDirt(10, 8);
+            map.AddDirt(1, 1);
+            map.AddObstacle(2, 5);
+            map.AddObstacle(12, 1);
+
+            IStrategy strategy = new SpiralStrategy();
+
+            Robot robot = new Robot(map, strategy);
+            robot.StartCleaning();
+
+            Console.WriteLine("\nCleaning Completed!");
+        }
+    }
 }
+// almost done
