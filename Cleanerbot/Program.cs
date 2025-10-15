@@ -61,8 +61,16 @@ namespace RobotCleaner
                 }
                 Console.WriteLine();
             }
-            Thread.Sleep(3
-            00); 
+            Thread.Sleep(300);
+        }
+
+        public bool HasDirt()
+        {
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                    if (_grid[x, y] == CellType.Dirt)
+                        return true;
+            return false;
         }
     }
 
@@ -99,7 +107,6 @@ namespace RobotCleaner
             return false;
         }
 
-        // Step-by-step move
         public bool MoveStep(int dx, int dy)
         {
             int newX = X + dx;
@@ -147,87 +154,83 @@ namespace RobotCleaner
         }
     }
 
-    public class SpiralStrategy : IStrategy
+    public class SpiralCleaningStrategy : IStrategy
     {
         public void Clean(Robot robot)
         {
-            int[,] directions = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
-            int dirIndex = 0;
-            int segmentLength = 1;
-            int stepsTaken = 0;
-            int turns = 0;
+            int left = 0;
+            int right = robot.Map.Width - 1;
+            int top = 0;
+            int bottom = robot.Map.Height - 1;
 
-            robot.CleanCurrentSpot();
-
-            while (true)
+            while (left <= right && top <= bottom)
             {
-                bool moved = robot.MoveStep(directions[dirIndex, 0], directions[dirIndex, 1]);
-                if (!moved)
+                for (int x = left; x <= right; x++)
                 {
-                    dirIndex = (dirIndex + 1) % 4;
-                    turns++;
-                    if (turns % 2 == 0) segmentLength++;
-                    continue;
+                    if (!robot.Map.HasDirt()) return;
+                    if (robot.Move(x, top))
+                        robot.CleanCurrentSpot();
+                    Thread.Sleep(200);
                 }
+                top++;
 
-                robot.CleanCurrentSpot();
-                stepsTaken++;
-
-                if (stepsTaken >= segmentLength)
+                for (int y = top; y <= bottom; y++)
                 {
-                    stepsTaken = 0;
-                    dirIndex = (dirIndex + 1) % 4;
-                    turns++;
-
-                    if (turns % 2 == 0)
-                        segmentLength++;
+                    if (!robot.Map.HasDirt()) return;
+                    if (robot.Move(right, y))
+                        robot.CleanCurrentSpot();
+                    Thread.Sleep(200);
                 }
+                right--;
 
-                if (!CanMoveInAnyDirection(robot, directions))
-                    break;
-            }
-        }
+                for (int x = right; x >= left; x--)
+                {
+                    if (!robot.Map.HasDirt()) return;
+                    if (robot.Move(x, bottom))
+                        robot.CleanCurrentSpot();
+                    Thread.Sleep(200);
+                }
+                bottom--;
 
-        private bool CanMoveInAnyDirection(Robot robot, int[,] directions)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                int newX = robot.X + directions[i, 0];
-                int newY = robot.Y + directions[i, 1];
-                if (robot.Map.IsInBounds(newX, newY) && !robot.Map.IsObstacle(newX, newY))
-                    return true;
+                for (int y = bottom; y >= top; y--)
+                {
+                    if (!robot.Map.HasDirt()) return;
+                    if (robot.Move(left, y))
+                        robot.CleanCurrentSpot();
+                    Thread.Sleep(200);
+                }
+                left++;
             }
-            return false;
+
+            Console.WriteLine("All dirt is cleaned!");
         }
     }
 
+    
     public class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("MIDTERM EXAM: Robot Cleaner Simulation\n");
             Console.WriteLine("Choose cleaning strategy:");
-            Console.WriteLine("[1] Perimeter Hugger");
-            Console.WriteLine("[2] Spiral Cleaner");
-            Console.Write("\nEnter choice: ");
+            Console.WriteLine("1 - Perimeter Hugger");
+            Console.WriteLine("2 - Spiral Cleaning");
+            Console.Write("Enter choice: ");
             string choice = Console.ReadLine();
 
-            Map map = new Map(20, 10);
-            map.AddDirt(5, 3);
-            map.AddDirt(10, 8);
-            map.AddDirt(1, 1);
-            map.AddObstacle(2, 5);
-            map.AddObstacle(12, 1);
+            IStrategy strategy = choice == "2"
+                ? new SpiralCleaningStrategy()
+                : new PerimeterHuggerStrategy();
 
-            IStrategy strategy = choice == "1"
-                ? new PerimeterHuggerStrategy()
-                : new SpiralStrategy();
+            Map map = new Map(10, 6);
+            map.AddDirt(5, 3);
+            map.AddDirt(8, 2);
+            map.AddObstacle(2, 4);
+            map.AddObstacle(7, 1);
 
             Robot robot = new Robot(map, strategy);
             robot.StartCleaning();
 
-            Console.WriteLine("\nCleaning Completed!");
-            Console.ReadKey();
+            Console.WriteLine("Done cleaning!");
         }
     }
 }
