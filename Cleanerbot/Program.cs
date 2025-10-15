@@ -61,7 +61,7 @@ namespace RobotCleaner
                 }
                 Console.WriteLine();
             }
-            Thread.Sleep(300);
+            Thread.Sleep(800);
         }
 
         public bool HasDirt()
@@ -221,11 +221,11 @@ namespace RobotCleaner
                 ? new SpiralCleaningStrategy()
                 : new PerimeterHuggerStrategy();
 
-            Map map = new Map(10, 6);
+            Map map = new Map(20, 10);
             map.AddDirt(5, 3);
-            map.AddDirt(8, 2);
-            map.AddObstacle(2, 4);
-            map.AddObstacle(7, 1);
+            map.AddDirt(10, 2);
+            map.AddObstacle(2, 5);
+            map.AddObstacle(12, 1);
 
             Robot robot = new Robot(map, strategy);
             robot.StartCleaning();
