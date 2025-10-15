@@ -1,0 +1,15 @@
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\bin\Debug\net8.0\Cleanerbot.exe
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\bin\Debug\net8.0\Cleanerbot.deps.json
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\bin\Debug\net8.0\Cleanerbot.runtimeconfig.json
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\bin\Debug\net8.0\Cleanerbot.dll
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\bin\Debug\net8.0\Cleanerbot.pdb
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.AssemblyInfoInputs.cache
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.AssemblyInfo.cs
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.csproj.CoreCompileInputs.cache
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.sourcelink.json
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.dll
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\refint\Cleanerbot.dll
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.pdb
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\Cleanerbot.genruntimeconfig.cache
+C:\Users\Aneza Jamion\Cleanerbot\Cleanerbot\obj\Debug\net8.0\ref\Cleanerbot.dll
